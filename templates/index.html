@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relay Control</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+      background: #f0f0f0;
+    }
+    h1 {
+      color: #333;
+    }
+    .status {
+      font-size: 2em;
+      margin: 20px 0;
+      padding: 20px;
+      width: 200px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 10px;
+      color: white;
+      background-color: #555;
+    }
+    .status.on {
+      background-color: #28a745; /* green */
+    }
+    .status.off {
+      background-color: #dc3545; /* red */
+    }
+    button {
+      font-size: 1.2em;
+      margin: 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+    }
+    button.on {
+      background-color: #28a745;
+    }
+    button.off {
+      background-color: #dc3545;
+    }
+    button:hover {
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+  <h1>Relay Control Panel</h1>
+  <div id="relayStatus" class="status off">OFF</div>
+
+  <button class="on" onclick="setRelay('ON')">Turn ON</button>
+  <button class="off" onclick="setRelay('OFF')">Turn OFF</button>
+
+  <script>
+    // Initial relay status from Flask template variable
+    let relayStatus = "{{ relay_status }}";  // Flask will replace this
+
+    function updateStatus(status) {
+      const statusDiv = document.getElementById("relayStatus");
+      statusDiv.textContent = status;
+      if (status === "ON" || status === "01") {
+        statusDiv.classList.add("on");
+        statusDiv.classList.remove("off");
+      } else {
+        statusDiv.classList.add("off");
+        statusDiv.classList.remove("on");
+      }
+    }
+
+    function setRelay(status) {
+      fetch(`/relay/${status}`)
+        .then(response => response.text())
+        .then(html => {
+          // Reload page or update status dynamically
+          // For simplicity, reload the page
+          window.location.reload();
+        })
+        .catch(err => {
+          alert("Failed to set relay: " + err);
+        });
+    }
+
+    // On page load update the status display
+    window.onload = () => {
+      updateStatus(relayStatus);
+    };
+  </script>
+</body>
+</html>
